@@ -103,7 +103,7 @@ body {
   padding: 0;
   z-index: 200;
   transition: transform var(--transition), background var(--transition);
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 /* accent line at top */

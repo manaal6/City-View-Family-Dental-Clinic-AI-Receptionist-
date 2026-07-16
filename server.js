@@ -17,8 +17,7 @@ if (fs.existsSync(envPath)) {
   dotenv.config({ path: envPath });
   console.log(`✅  Loaded .env from: ${envPath}`);
 } else {
-  console.error(`❌  .env file NOT found at: ${envPath}`);
-  process.exit(1);
+  console.log(`ℹ️  No .env file found — using platform environment variables`);
 }
 
 const clinic = JSON.parse(fs.readFileSync(path.join(__dirname, "clinic.json"), "utf8"));

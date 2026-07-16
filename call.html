@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Talk to Your Clinic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&family=Bricolage+Grotesque:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="dashboard.css"/>
+<style>
+  body{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg-base);font-family:var(--font-ui);color:var(--text-primary)}
+  .call-card{width:420px;max-width:92vw;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow-xl);padding:32px 28px;text-align:center}
+  .call-back{position:fixed;top:20px;left:20px}
+  .call-back a{display:flex;align-items:center;gap:6px;color:var(--text-secondary);font-size:13px;font-family:var(--font-data)}
+  .call-back a:hover{color:var(--text-primary)}
+  .agent-avatar{width:88px;height:88px;border-radius:50%;margin:0 auto 16px;background:linear-gradient(135deg,var(--accent),var(--cyan));display:flex;align-items:center;justify-content:center;font-family:var(--font-serif);font-size:38px;color:#fff;position:relative}
+  .agent-avatar .pulse{position:absolute;inset:-8px;border-radius:50%;border:2px solid var(--accent);opacity:0;animation:none}
+  .agent-avatar.speaking .pulse{animation:pulse 1.4s ease-out infinite}
+  @keyframes pulse{0%{opacity:.6;transform:scale(1)}100%{opacity:0;transform:scale(1.35)}}
+  .agent-name{font-size:20px;font-weight:700}
+  .agent-sub{font-size:13px;color:var(--text-secondary);margin-top:2px;font-family:var(--font-data)}
+  .call-status{margin-top:18px;font-size:12px;font-family:var(--font-data);color:var(--text-muted);display:flex;align-items:center;justify-content:center;gap:6px}
+  .status-dot{width:7px;height:7px;border-radius:50%;background:var(--text-muted)}
+  .status-dot.live{background:var(--accent);box-shadow:0 0 8px var(--accent-glow)}
+  .status-dot.connecting{background:var(--amber)}
+  .transcript{margin-top:22px;min-height:130px;max-height:220px;overflow-y:auto;text-align:left;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:14px;font-size:13.5px;line-height:1.5}
+  .transcript .line{margin-bottom:10px}
+  .transcript .line:last-child{margin-bottom:0}
+  .transcript .who{font-family:var(--font-data);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:2px}
+  .transcript .who.you{color:var(--blue)}
+  .transcript .who.ai{color:var(--accent)}
+  .transcript .interim{opacity:.5;font-style:italic}
+  .transcript:empty::before{content:'Your conversation will appear here…';color:var(--text-ghost)}
+  .controls{margin-top:24px;display:flex;justify-content:center;gap:14px}
+  .mic-btn{width:64px;height:64px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition);box-shadow:var(--shadow-glow)}
+  .mic-btn:hover{filter:brightness(1.08)}
+  .mic-btn.active{background:var(--rose);box-shadow:0 0 40px rgba(244,63,94,.35)}
+  .mic-btn svg{width:26px;height:26px}
+  .hint{margin-top:14px;font-size:12px;color:var(--text-muted)}
+  .call-back a svg{width:16px;height:16px}
+</style>
+</head>
+<body>
+
+<div class="call-back">
+  <a href="index.html">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 4l-6 6 6 6"/></svg>
+    Back to dashboard
+  </a>
+</div>
+
+<div class="call-card">
+  <div class="agent-avatar" id="agentAvatar"><div class="pulse"></div><span id="avatarLetter">?</span></div>
+  <div class="agent-name" id="agentName">Loading…</div>
+  <div class="agent-sub" id="agentSub">AI Receptionist</div>
+
+  <div class="call-status">
+    <span class="status-dot" id="statusDot"></span>
+    <span id="statusText">Not connected</span>
+  </div>
+
+  <div class="transcript" id="transcript"></div>
+
+  <div class="controls">
+    <button class="mic-btn" id="micBtn" title="Start call">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+    </button>
+  </div>
+  <div class="hint" id="hint">Loading…</div>
+</div>
+
+<script>
+let CLINIC = { name: "Your Clinic", location: "", avatarLetter: "?" };
+
+fetch('/api/clinic').then(r => r.json()).then(c => {
+  CLINIC = c;
+  document.title = `Talk to ${c.name}`;
+  document.getElementById('avatarLetter').textContent = c.avatarLetter || c.name[0];
+  document.getElementById('agentName').textContent = c.name;
+  document.getElementById('agentSub').textContent = `AI Receptionist · ${c.name}${c.location ? ', ' + c.location : ''}`;
+  document.getElementById('hint').textContent = `Tap the mic to start talking with ${c.name}`;
+}).catch(() => {});
+
+(() => {
+  const micBtn      = document.getElementById('micBtn');
+  const statusDot    = document.getElementById('statusDot');
+  const statusText   = document.getElementById('statusText');
+  const transcriptEl = document.getElementById('transcript');
+  const hint          = document.getElementById('hint');
+  const avatar        = document.getElementById('agentAvatar');
+
+  let ws = null;
+  let audioCtx = null;
+  let processor = null;
+  let micStream = null;
+  let sourceNode = null;
+  let isCallActive = false;
+  let interimLine = null;
+
+  // Sequential playback queue for AI audio chunks
+  let playQueue = [];
+  let isPlaying = false;
+
+  function setStatus(state, text) {
+    statusDot.className = 'status-dot' + (state ? ' ' + state : '');
+    statusText.textContent = text;
+  }
+
+  function addLine(who, text, isInterim = false) {
+    if (isInterim) {
+      if (!interimLine) {
+        interimLine = document.createElement('div');
+        interimLine.className = 'line interim';
+        interimLine.innerHTML = `<div class="who you">You</div><div class="txt"></div>`;
+        transcriptEl.appendChild(interimLine);
+      }
+      interimLine.querySelector('.txt').textContent = text;
+      transcriptEl.scrollTop = transcriptEl.scrollHeight;
+      return;
+    }
+    if (interimLine) { interimLine.remove(); interimLine = null; }
+    const line = document.createElement('div');
+    line.className = 'line';
+    line.innerHTML = `<div class="who ${who === 'You' ? 'you' : 'ai'}">${who}</div><div class="txt"></div>`;
+    line.querySelector('.txt').textContent = text;
+    transcriptEl.appendChild(line);
+    transcriptEl.scrollTop = transcriptEl.scrollHeight;
+  }
+
+  function connectWS() {
+    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+    ws = new WebSocket(`${proto}://${location.host}/ws`);
+    ws.binaryType = 'arraybuffer';
+
+    ws.onopen = () => {
+      setStatus('live', 'Connected');
+      ws.send(JSON.stringify({ type: 'start_mic' }));
+    };
+
+    ws.onmessage = (evt) => {
+      const msg = JSON.parse(evt.data);
+      switch (msg.type) {
+        case 'interim_transcript':
+          addLine('You', msg.text, true);
+          break;
+        case 'user_transcript':
+          addLine('You', msg.text, false);
+          break;
+        case 'ai_text':
+          addLine(CLINIC.name, msg.text, false);
+          break;
+        case 'ai_audio':
+          enqueueAudio(msg.audio);
+          break;
+      }
+    };
+
+    ws.onclose = () => {
+      setStatus('', 'Disconnected');
+      avatar.classList.remove('speaking');
+    };
+
+    ws.onerror = () => setStatus('', 'Connection error');
+  }
+
+  // ── Decode & play base64 WAV chunks sequentially ─────────────────────
+  function enqueueAudio(base64) {
+    playQueue.push(base64);
+    if (!isPlaying) playNext();
+  }
+
+  async function playNext() {
+    if (playQueue.length === 0) { isPlaying = false; avatar.classList.remove('speaking'); return; }
+    isPlaying = true;
+    avatar.classList.add('speaking');
+    const base64 = playQueue.shift();
+    try {
+      const bin = atob(base64);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const audioBuffer = await ctx.decodeAudioData(bytes.buffer);
+      const src = ctx.createBufferSource();
+      src.buffer = audioBuffer;
+      src.connect(ctx.destination);
+      src.onended = () => { ctx.close(); playNext(); };
+      src.start();
+    } catch (e) {
+      console.error('Audio playback error', e);
+      playNext();
+    }
+  }
+
+  // ── Mic capture: downsample to 16kHz mono PCM16, send as binary frames ─
+  async function startMic() {
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    sourceNode = audioCtx.createMediaStreamSource(micStream);
+    processor = audioCtx.createScriptProcessor(4096, 1, 1);
+
+    const inputSampleRate = audioCtx.sampleRate;
+    const targetSampleRate = 16000;
+
+    processor.onaudioprocess = (e) => {
+      if (!ws || ws.readyState !== 1) return;
+      const input = e.inputBuffer.getChannelData(0);
+      const downsampled = downsample(input, inputSampleRate, targetSampleRate);
+      const pcm16 = floatTo16BitPCM(downsampled);
+      ws.send(pcm16);
+    };
+
+    sourceNode.connect(processor);
+    processor.connect(audioCtx.destination);
+  }
+
+  function downsample(buffer, inRate, outRate) {
+    if (outRate === inRate) return buffer;
+    const ratio = inRate / outRate;
+    const newLength = Math.round(buffer.length / ratio);
+    const result = new Float32Array(newLength);
+    let offsetResult = 0, offsetBuffer = 0;
+    while (offsetResult < result.length) {
+      const nextOffsetBuffer = Math.round((offsetResult + 1) * ratio);
+      let accum = 0, count = 0;
+      for (let i = offsetBuffer; i < nextOffsetBuffer && i < buffer.length; i++) { accum += buffer[i]; count++; }
+      result[offsetResult] = accum / (count || 1);
+      offsetResult++;
+      offsetBuffer = nextOffsetBuffer;
+    }
+    return result;
+  }
+
+  function floatTo16BitPCM(input) {
+    const output = new ArrayBuffer(input.length * 2);
+    const view = new DataView(output);
+    let offset = 0;
+    for (let i = 0; i < input.length; i++, offset += 2) {
+      let s = Math.max(-1, Math.min(1, input[i]));
+      view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+    }
+    return output;
+  }
+
+  function stopMic() {
+    if (processor) { processor.disconnect(); processor.onaudioprocess = null; processor = null; }
+    if (sourceNode) { sourceNode.disconnect(); sourceNode = null; }
+    if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+    if (audioCtx) { audioCtx.close(); audioCtx = null; }
+    if (ws && ws.readyState === 1) ws.send(JSON.stringify({ type: 'stop_mic' }));
+  }
+
+  micBtn.addEventListener('click', async () => {
+    if (!isCallActive) {
+      isCallActive = true;
+      micBtn.classList.add('active');
+      hint.textContent = 'Listening… tap to end the call';
+      setStatus('connecting', 'Connecting…');
+      transcriptEl.innerHTML = '';
+      connectWS();
+      try {
+        await startMic();
+      } catch (e) {
+        setStatus('', 'Microphone access denied');
+        hint.textContent = 'Please allow microphone access and try again.';
+        isCallActive = false;
+        micBtn.classList.remove('active');
+      }
+    } else {
+      isCallActive = false;
+      micBtn.classList.remove('active');
+      hint.textContent = `Tap the mic to start talking with ${CLINIC.name}`;
+      setStatus('', 'Call ended');
+      stopMic();
+      if (ws) { ws.close(); ws = null; }
+      playQueue = [];
+    }
+  });
+})();
+</script>
+</body>
+</html>

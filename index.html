@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title id="pageTitle">Clinic Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&family=Bricolage+Grotesque:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="dashboard.css"/>
+</head>
+<body>
+
+<!-- ░░ SIDEBAR ░░ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-mark">
+      <svg viewBox="0 0 28 28" fill="none"><path d="M14 2L26 8V20L14 26L2 20V8L14 2Z" stroke="currentColor" stroke-width="1.5"/><path d="M14 8L20 11V17L14 20L8 17V11L14 8Z" fill="currentColor" opacity=".3"/></svg>
+    </div>
+    <div class="sb-logo-text">
+      <span class="sb-logo-name" id="sbLogoName">Loading…</span>
+      <span class="sb-logo-sub" id="sbLogoSub">Dashboard</span>
+    </div>
+  </div>
+
+  <nav class="sb-nav">
+    <div class="sb-nav-group">
+      <span class="sb-group-label">Main</span>
+      <a href="#" class="sb-item active" data-page="overview">
+        <svg viewBox="0 0 20 20"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg>
+        <span>Overview</span>
+      </a>
+      <a href="#" class="sb-item" data-page="leads">
+        <svg viewBox="0 0 20 20"><path d="M13 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/><path d="M2 17s0-4 8-4 8 4 8 4"/></svg>
+        <span>Leads</span>
+        <span class="sb-badge" id="sbBadge">0</span>
+      </a>
+      <a href="#" class="sb-item" data-page="analytics">
+        <svg viewBox="0 0 20 20"><path d="M3 14l4-4 4 2 6-6"/><circle cx="3" cy="14" r="1.5"/><circle cx="7" cy="10" r="1.5"/><circle cx="11" cy="12" r="1.5"/><circle cx="17" cy="6" r="1.5"/></svg>
+        <span>Analytics</span>
+      </a>
+    </div>
+    <div class="sb-nav-group">
+      <span class="sb-group-label">System</span>
+      <a href="call.html" class="sb-item" style="color:var(--accent)">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 1a2 2 0 0 0-2 2v6a2 2 0 0 0 4 0V3a2 2 0 0 0-2-2z"/><path d="M14.5 7.5v1.5a5.5 5.5 0 0 1-11 0V7.5"/></svg>
+        <span id="talkToLabel">Talk to Clinic</span>
+      </a>
+      <a href="#" class="sb-item" data-page="settings">
+        <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="3"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42"/></svg>
+        <span>Settings</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="sb-footer">
+    <button class="sb-theme-btn" id="themeBtn" title="Toggle theme">
+      <svg id="themeIconSun" viewBox="0 0 20 20"><circle cx="10" cy="10" r="4"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.41 1.41M14.37 14.37l1.41 1.41M4.22 15.78l1.41-1.41M14.37 5.63l1.41-1.41"/></svg>
+      <svg id="themeIconMoon" viewBox="0 0 20 20" style="display:none"><path d="M17.5 10.5A7.5 7.5 0 1 1 9.5 2.5a5.5 5.5 0 0 0 8 8z"/></svg>
+      <span id="themeLabel">Light Mode</span>
+    </button>
+    <div class="sb-status">
+      <span class="status-dot live"></span>
+      <span id="liveStatus">Live · <span id="lastSync">—</span></span>
+    </div>
+  </div>
+</aside>
+
+<!-- ░░ MOBILE TOPBAR ░░ -->
+<header class="topbar" id="topbar">
+  <button class="topbar-ham" id="hamBtn">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="topbar-brand">
+    <div class="sb-logo-mark sm">
+      <svg viewBox="0 0 28 28" fill="none"><path d="M14 2L26 8V20L14 26L2 20V8L14 2Z" stroke="currentColor" stroke-width="1.5"/><path d="M14 8L20 11V17L14 20L8 17V11L14 8Z" fill="currentColor" opacity=".4"/></svg>
+    </div>
+    <span id="topbarBrand">Clinic</span>
+  </div>
+  <button class="topbar-refresh" id="topRefreshBtn">
+    <svg viewBox="0 0 20 20"><path d="M4 10a6 6 0 0 1 10.6-3.9M16 10a6 6 0 0 1-10.6 3.9"/><path d="M15 6l1.6-1.6M4.4 14l1.6 1.6"/></svg>
+  </button>
+</header>
+
+<div class="mob-overlay" id="mobOverlay"></div>
+
+<!-- ░░ MAIN SHELL ░░ -->
+<div class="shell">
+
+  <!-- TOP HEADER (desktop) -->
+  <header class="header">
+    <div class="header-left">
+      <h1 class="header-title" id="headerTitle">Overview</h1>
+      <div class="header-breadcrumb" id="headerBreadcrumb">Dashboard / Overview</div>
+    </div>
+    <div class="header-right">
+      <div class="search-wrap">
+        <svg viewBox="0 0 20 20"><circle cx="9" cy="9" r="5.5"/><path d="M14.5 14.5L18 18"/></svg>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search leads…"/>
+        <kbd>⌘K</kbd>
+      </div>
+      <button class="hdr-btn" id="refreshBtn" title="Refresh">
+        <svg viewBox="0 0 20 20"><path d="M4 10a6 6 0 0 1 10.6-3.9M16 10a6 6 0 0 1-10.6 3.9"/><path d="M15 6l1.6-1.6M4.4 14l1.6 1.6"/></svg>
+      </button>
+      <div class="avatar" id="headerAvatar" title="Clinic">?</div>
+    </div>
+  </header>
+
+  <!-- ░░ PAGE: OVERVIEW ░░ -->
+  <section class="page active" id="page-overview">
+
+    <!-- STAT CARDS -->
+    <div class="stats-grid">
+      <div class="stat-card" style="--card-glow:#10b981">
+        <div class="stat-top">
+          <div class="stat-icon" style="--ic:#10b981">
+            <svg viewBox="0 0 20 20"><path d="M13 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/><path d="M2 17s0-4 8-4 8 4 8 4"/></svg>
+          </div>
+          <span class="stat-delta pos" id="deltaTotalLeads">+0%</span>
+        </div>
+        <div class="stat-val" id="svTotal"><div class="skel"></div></div>
+        <div class="stat-label">Total Leads</div>
+        <div class="stat-bar"><div class="stat-bar-fill" id="barTotal" style="width:0%;--bc:#10b981"></div></div>
+      </div>
+
+      <div class="stat-card" style="--card-glow:#3b82f6">
+        <div class="stat-top">
+          <div class="stat-icon" style="--ic:#3b82f6">
+            <svg viewBox="0 0 20 20"><path d="M16 9l-5 5-3-3-4 4"/><circle cx="16" cy="4" r="2"/></svg>
+          </div>
+          <span class="stat-delta pos" id="deltaCompleted">—</span>
+        </div>
+        <div class="stat-val" id="svCompleted"><div class="skel"></div></div>
+        <div class="stat-label">Completed Calls</div>
+        <div class="stat-bar"><div class="stat-bar-fill" id="barCompleted" style="width:0%;--bc:#3b82f6"></div></div>
+      </div>
+
+      <div class="stat-card" style="--card-glow:#f59e0b">
+        <div class="stat-top">
+          <div class="stat-icon" style="--ic:#f59e0b">
+            <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2"/></svg>
+          </div>
+          <span class="stat-delta" id="deltaAvgDur">—</span>
+        </div>
+        <div class="stat-val" id="svAvgDur"><div class="skel"></div></div>
+        <div class="stat-label">Avg Call Duration</div>
+        <div class="stat-bar"><div class="stat-bar-fill" id="barAvgDur" style="width:0%;--bc:#f59e0b"></div></div>
+      </div>
+
+      <div class="stat-card" style="--card-glow:#ef4444">
+        <div class="stat-top">
+          <div class="stat-icon" style="--ic:#ef4444">
+            <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><path d="M10 7v3M10 13h.01"/></svg>
+          </div>
+          <span class="stat-delta neg" id="deltaDropoff">—</span>
+        </div>
+        <div class="stat-val" id="svDropoff"><div class="skel"></div></div>
+        <div class="stat-label">Drop-off Rate</div>
+        <div class="stat-bar"><div class="stat-bar-fill" id="barDropoff" style="width:0%;--bc:#ef4444"></div></div>
+      </div>
+
+      <div class="stat-card" style="--card-glow:#8b5cf6">
+        <div class="stat-top">
+          <div class="stat-icon" style="--ic:#8b5cf6">
+            <svg viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="14" rx="2"/><path d="M13 2v4M7 2v4M3 10h14"/></svg>
+          </div>
+          <span class="stat-delta pos" id="deltaToday">—</span>
+        </div>
+        <div class="stat-val" id="svToday"><div class="skel"></div></div>
+        <div class="stat-label">Leads Today</div>
+        <div class="stat-bar"><div class="stat-bar-fill" id="barToday" style="width:0%;--bc:#8b5cf6"></div></div>
+      </div>
+    </div>
+
+    <!-- CHARTS ROW -->
+    <div class="charts-row">
+      <div class="chart-panel large">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Lead Velocity</div>
+            <div class="panel-sub">Inbound leads per day</div>
+          </div>
+          <div class="range-tabs">
+            <button class="rtab active" data-d="7">7d</button>
+            <button class="rtab" data-d="14">14d</button>
+            <button class="rtab" data-d="30">30d</button>
+          </div>
+        </div>
+        <div class="chart-area"><canvas id="cLeadsTime"></canvas></div>
+      </div>
+      <div class="chart-panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Services</div>
+            <div class="panel-sub">Breakdown by type</div>
+          </div>
+        </div>
+        <div class="chart-area donut-area"><canvas id="cServices"></canvas></div>
+      </div>
+    </div>
+
+    <!-- COMPLETION CHART -->
+    <div class="chart-panel full-w">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Completion vs Drop-off</div>
+          <div class="panel-sub">Weekly call outcome breakdown</div>
+        </div>
+      </div>
+      <div class="chart-area bar-area"><canvas id="cCompletion"></canvas></div>
+    </div>
+
+    <!-- RECENT LEADS -->
+    <div class="table-panel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Recent Leads</div>
+          <div class="panel-sub">Last 10 captured</div>
+        </div>
+        <button class="ghost-btn" data-page="leads">View all →</button>
+      </div>
+      <div class="table-scroll">
+        <table class="data-table" id="recentTable">
+          <thead><tr>
+            <th>Name</th><th>Phone</th><th>Service</th><th>Duration</th><th>Status</th><th>Time</th>
+          </tr></thead>
+          <tbody id="recentBody"></tbody>
+        </table>
+      </div>
+      <div class="table-empty" id="recentEmpty" style="display:none">No leads captured yet.</div>
+    </div>
+
+  </section>
+
+  <!-- ░░ PAGE: LEADS ░░ -->
+  <section class="page" id="page-leads">
+    <div class="page-toolbar">
+      <div class="toolbar-filters">
+        <div class="filt-group">
+          <label>From</label>
+          <input type="date" class="filt-input" id="fFrom"/>
+        </div>
+        <div class="filt-group">
+          <label>To</label>
+          <input type="date" class="filt-input" id="fTo"/>
+        </div>
+        <div class="filt-group">
+          <label>Service</label>
+          <select class="filt-input" id="fService"><option value="">All services</option></select>
+        </div>
+        <div class="filt-group">
+          <label>Status</label>
+          <select class="filt-input" id="fStatus">
+            <option value="">All</option>
+            <option value="1">Completed</option>
+            <option value="0">Dropped</option>
+          </select>
+        </div>
+        <button class="clear-btn" id="clearFilters">Clear</button>
+      </div>
+      <div class="toolbar-actions">
+        <span class="result-count" id="resultCount">0 leads</span>
+        <button class="action-btn" id="csvBtn">
+          <svg viewBox="0 0 20 20"><path d="M4 16h12M10 4v8M7 9l3 3 3-3"/></svg>
+          Export CSV
+        </button>
+      </div>
+    </div>
+
+    <div class="table-panel">
+      <div class="table-scroll">
+        <table class="data-table full" id="leadsTable">
+          <thead><tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Service</th>
+            <th>Duration</th>
+            <th>Status</th>
+            <th>Timestamp</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="leadsBody"></tbody>
+        </table>
+      </div>
+      <div class="table-empty" id="leadsEmpty" style="display:none">
+        <svg viewBox="0 0 48 48"><path d="M24 4L44 14V34L24 44L4 34V14L24 4Z" stroke-width="2"/><circle cx="24" cy="24" r="6" stroke-width="2"/></svg>
+        <p>No leads match your filters.</p>
+      </div>
+      <div class="skel-rows" id="skelRows">
+        <div class="skel-row"><div class="skel w30"></div><div class="skel w20"></div><div class="skel w40"></div></div>
+        <div class="skel-row"><div class="skel w20"></div><div class="skel w40"></div><div class="skel w30"></div></div>
+        <div class="skel-row"><div class="skel w40"></div><div class="skel w20"></div><div class="skel w20"></div></div>
+        <div class="skel-row"><div class="skel w30"></div><div class="skel w30"></div><div class="skel w40"></div></div>
+        <div class="skel-row"><div class="skel w20"></div><div class="skel w40"></div><div class="skel w30"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ PAGE: ANALYTICS ░░ -->
+  <section class="page" id="page-analytics">
+    <div class="analytics-grid">
+      <div class="chart-panel full-w">
+        <div class="panel-header">
+          <div><div class="panel-title">Lead Volume — 30 Days</div><div class="panel-sub">Daily lead capture trend</div></div>
+        </div>
+        <div class="chart-area"><canvas id="cAnalyticsTime"></canvas></div>
+      </div>
+      <div class="chart-panel">
+        <div class="panel-header"><div><div class="panel-title">Service Distribution</div><div class="panel-sub">All time</div></div></div>
+        <div class="chart-area donut-area"><canvas id="cAnalyticsServices"></canvas></div>
+      </div>
+      <div class="chart-panel">
+        <div class="panel-header"><div><div class="panel-title">Hourly Distribution</div><div class="panel-sub">When calls come in</div></div></div>
+        <div class="chart-area"><canvas id="cHourly"></canvas></div>
+      </div>
+      <div class="chart-panel full-w">
+        <div class="panel-header"><div><div class="panel-title">Weekly Outcome Breakdown</div><div class="panel-sub">Completion vs drop-off by week</div></div></div>
+        <div class="chart-area bar-area"><canvas id="cAnalyticsCompletion"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ PAGE: SETTINGS ░░ -->
+  <section class="page" id="page-settings">
+    <div class="settings-wrap">
+      <div class="settings-card">
+        <h3>Refresh Interval</h3>
+        <p>Dashboard auto-refreshes every 30 seconds.</p>
+        <div class="settings-row">
+          <select class="filt-input" id="refreshInterval">
+            <option value="15000">15 seconds</option>
+            <option value="30000" selected>30 seconds</option>
+            <option value="60000">1 minute</option>
+            <option value="0">Manual only</option>
+          </select>
+        </div>
+      </div>
+      <div class="settings-card">
+        <h3>Data Source</h3>
+        <p>API endpoint for lead data.</p>
+        <div class="settings-row">
+          <input type="text" class="filt-input" id="apiEndpoint" value="/api/leads" readonly/>
+          <span class="status-chip ok">Connected</span>
+        </div>
+      </div>
+      <div class="settings-card">
+        <h3>Appearance</h3>
+        <p>Toggle between dark and light mode.</p>
+        <div class="settings-row">
+          <button class="action-btn" id="settingsThemeBtn">Toggle Theme</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /shell -->
+
+<!-- ░░ LEAD DETAIL MODAL ░░ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-eyebrow">Lead Detail</div>
+        <h2 class="modal-name" id="mName">—</h2>
+      </div>
+      <div class="modal-header-actions">
+        <button class="modal-action-btn" id="mExportPdf">
+          <svg viewBox="0 0 20 20"><rect x="4" y="2" width="12" height="16" rx="2"/><path d="M8 6h4M8 10h4M8 14h2"/></svg>
+          Export PDF
+        </button>
+        <button class="modal-close" id="modalClose">
+          <svg viewBox="0 0 20 20"><path d="M5 5l10 10M15 5L5 15"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-badge-row" id="mBadgeRow"></div>
+      <div class="modal-grid">
+        <div class="modal-field">
+          <div class="mf-label">Phone</div>
+          <div class="mf-val mono" id="mPhone">—</div>
+        </div>
+        <div class="modal-field">
+          <div class="mf-label">Service</div>
+          <div class="mf-val" id="mService">—</div>
+        </div>
+        <div class="modal-field">
+          <div class="mf-label">Call Duration</div>
+          <div class="mf-val mono" id="mDuration">—</div>
+        </div>
+        <div class="modal-field">
+          <div class="mf-label">Timestamp</div>
+          <div class="mf-val mono" id="mTimestamp">—</div>
+        </div>
+      </div>
+      <div class="modal-notes-section">
+        <div class="mf-label">Call Notes</div>
+        <div class="modal-notes" id="mNotes">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+window.CLINIC = { name: "Clinic", location: "", avatarLetter: "?" };
+fetch('/api/clinic').then(r => r.json()).then(c => {
+  window.CLINIC = c;
+  const letter = c.avatarLetter || c.name[0];
+  document.getElementById('pageTitle').textContent = `${c.name} · Reception Dashboard`;
+  document.title = `${c.name} · Reception Dashboard`;
+  document.getElementById('sbLogoName').textContent = c.name;
+  document.getElementById('sbLogoSub').textContent = c.name;
+  document.getElementById('talkToLabel').textContent = `Talk to ${c.name}`;
+  document.getElementById('topbarBrand').textContent = c.name;
+  document.getElementById('headerAvatar').textContent = letter;
+  document.getElementById('headerAvatar').title = c.name;
+}).catch(() => {});
+</script>
+<script src="dashboard.js"></script>
+</body>
+</html>

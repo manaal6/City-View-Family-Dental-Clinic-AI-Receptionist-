@@ -1,0 +1,21 @@
+{
+  "name": "dental-ai-calling-agent",
+  "version": "2.0.0",
+  "description": "Generic real-time AI voice reception agent for dental clinics, configurable via clinic.json, using Groq LLM + Deepgram STT/TTS",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "@deepgram/sdk": "^3.9.0",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.1",
+    "groq-sdk": "^0.3.3",
+    "ws": "^8.20.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

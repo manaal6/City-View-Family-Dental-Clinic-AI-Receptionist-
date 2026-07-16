@@ -379,11 +379,9 @@ fetch('/api/clinic').then(r => r.json()).then(c => {
       setStatus('connecting', 'Connecting…');
       hint.textContent = 'Connecting chat session…';
       connectWS(() => {
-        addLine('You', val, false);
         transmit();
       });
     } else {
-      addLine('You', val, false);
       transmit();
     }
   }

@@ -510,7 +510,28 @@ wss.on("connection", (ws) => {
     } catch (e) { console.warn("  ⚠️  Parse error:", e.message); }
   });
 
-  ws.on("close", () => { console.log("📵 Client disconnected"); sessionRef.stop?.(); });
+  ws.on("close", () => {
+    console.log("📵 Client disconnected");
+    sessionRef.stop?.();
+    if (!history._leadPushed) {
+      history._leadPushed = true;
+      const lead = extractLead(history);
+      lead.name = lead.name || "Anonymous";
+      lead.phone = lead.phone || "—";
+      lead.service = lead.service || "General Inquiry";
+
+      const leadsArr = fs.existsSync(LEADS_FILE)
+        ? JSON.parse(fs.readFileSync(LEADS_FILE, 'utf8')) : [];
+      leadsArr.push({
+        ...lead,
+        timestamp: new Date().toISOString(),
+        completed: false,
+        duration: Math.round((Date.now() - (history._callStart || Date.now())) / 1000)
+      });
+      fs.writeFileSync(LEADS_FILE, JSON.stringify(leadsArr, null, 2));
+      console.log(`  💾 Saved incomplete/dropped call log for ${lead.name}`);
+    }
+  });
   ws.on("error", (e) => console.error("  ❌ WS error:", e.message));
 });
 

@@ -415,6 +415,9 @@ body {
   overflow: hidden;
   margin-bottom: 14px;
 }
+.table-panel .panel-header {
+  padding: 20px 20px 0;
+}
 .table-scroll { overflow-x: auto; }
 .data-table {
   width: 100%; border-collapse: collapse;

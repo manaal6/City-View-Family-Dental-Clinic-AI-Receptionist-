@@ -8,11 +8,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&family=Bricolage+Grotesque:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="dashboard.css"/>
 <style>
-  body{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg-base);font-family:var(--font-ui);color:var(--text-primary)}
-  .call-card{width:420px;max-width:92vw;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow-xl);padding:32px 28px;text-align:center}
-  .call-back{position:fixed;top:20px;left:20px}
-  .call-back a{display:flex;align-items:center;gap:6px;color:var(--text-secondary);font-size:13px;font-family:var(--font-data)}
-  .call-back a:hover{color:var(--text-primary)}
+  body{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:var(--bg-base);font-family:var(--font-ui);color:var(--text-primary);padding:20px 14px}
+  .call-card{width:440px;max-width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow-xl);padding:32px 28px;text-align:center;display:flex;flex-direction:column}
+  .call-back{margin-bottom: 20px; align-self: center;}
+  .call-back a{display:flex;align-items:center;gap:6px;color:var(--text-secondary);font-size:13px;font-family:var(--font-data);background:var(--bg-surface);border:1px solid var(--border);padding:8px 16px;border-radius:20px;transition:var(--transition)}
+  .call-back a:hover{color:var(--text-primary);border-color:var(--border-med)}
   .agent-avatar{width:88px;height:88px;border-radius:50%;margin:0 auto 16px;background:linear-gradient(135deg,var(--accent),var(--cyan));display:flex;align-items:center;justify-content:center;font-family:var(--font-serif);font-size:38px;color:#fff;position:relative}
   .agent-avatar .pulse{position:absolute;inset:-8px;border-radius:50%;border:2px solid var(--accent);opacity:0;animation:none}
   .agent-avatar.speaking .pulse{animation:pulse 1.4s ease-out infinite}
@@ -23,7 +23,7 @@
   .status-dot{width:7px;height:7px;border-radius:50%;background:var(--text-muted)}
   .status-dot.live{background:var(--accent);box-shadow:0 0 8px var(--accent-glow)}
   .status-dot.connecting{background:var(--amber)}
-  .transcript{margin-top:22px;min-height:130px;max-height:220px;overflow-y:auto;text-align:left;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:14px;font-size:13.5px;line-height:1.5}
+  .transcript{margin-top:22px;min-height:160px;max-height:240px;overflow-y:auto;text-align:left;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:14px;font-size:13.5px;line-height:1.5}
   .transcript .line{margin-bottom:10px}
   .transcript .line:last-child{margin-bottom:0}
   .transcript .who{font-family:var(--font-data);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:2px}
@@ -31,13 +31,38 @@
   .transcript .who.ai{color:var(--accent)}
   .transcript .interim{opacity:.5;font-style:italic}
   .transcript:empty::before{content:'Your conversation will appear here…';color:var(--text-ghost)}
-  .controls{margin-top:24px;display:flex;justify-content:center;gap:14px}
+  .controls{margin-top:24px;display:flex;flex-direction:column;align-items:center;gap:12px}
+  .controls-row{display:flex;justify-content:center;align-items:center;gap:16px}
   .mic-btn{width:64px;height:64px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition);box-shadow:var(--shadow-glow)}
   .mic-btn:hover{filter:brightness(1.08)}
   .mic-btn.active{background:var(--rose);box-shadow:0 0 40px rgba(244,63,94,.35)}
   .mic-btn svg{width:26px;height:26px}
   .hint{margin-top:14px;font-size:12px;color:var(--text-muted)}
   .call-back a svg{width:16px;height:16px}
+
+  /* Chat Input Option styles */
+  .chat-divider{margin:20px 0 10px;display:flex;align-items:center;justify-content:center;gap:10px}
+  .chat-divider span.line{height:1px;background:var(--border);flex:1}
+  .chat-divider span.text{font-size:11px;color:var(--text-muted);text-transform:uppercase;font-family:var(--font-data);letter-spacing:0.05em}
+  .chat-input-row{display:flex;gap:8px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:6px 6px 6px 14px;align-items:center;transition:var(--transition)}
+  .chat-input-row:focus-within{border-color:var(--accent);box-shadow:0 0 8px var(--accent-glow)}
+  .chat-input-row input{flex:1;background:none;color:var(--text-primary);border:none;outline:none;font-size:13.5px}
+  .chat-input-row input::placeholder{color:var(--text-muted)}
+  .chat-input-row button{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition)}
+  .chat-input-row button:hover{filter:brightness(1.08)}
+  .chat-input-row button svg{width:16px;height:16px}
+
+  .end-btn{padding:8px 16px;border-radius:var(--radius-sm);background:transparent;border:1px solid var(--rose);color:var(--rose);font-size:12px;font-family:var(--font-data);cursor:pointer;transition:var(--transition)}
+  .end-btn:hover{background:rgba(244,63,94,.1)}
+
+  /* Responsive styling */
+  @media (max-width: 576px) {
+    body { justify-content: flex-start; padding: 12px }
+    .call-back { margin-top: 10px; margin-bottom: 16px; width: 100%; display: flex; justify-content: flex-start; }
+    .call-back a { padding: 6px 12px; font-size: 12px; }
+    .call-card { padding: 24px 18px; border-radius: var(--radius-lg); }
+    .transcript { min-height: 180px; max-height: 280px; }
+  }
 </style>
 </head>
 <body>
@@ -62,11 +87,27 @@
   <div class="transcript" id="transcript"></div>
 
   <div class="controls">
-    <button class="mic-btn" id="micBtn" title="Start call">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+    <div class="controls-row">
+      <button class="mic-btn" id="micBtn" title="Start microphone call">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      </button>
+      <button class="end-btn" id="endBtn" style="display: none;">End Session</button>
+    </div>
+    <div class="hint" id="hint">Loading…</div>
+  </div>
+
+  <div class="chat-divider">
+    <span class="line"></span>
+    <span class="text">Or Chat via Text</span>
+    <span class="line"></span>
+  </div>
+
+  <div class="chat-input-row">
+    <input type="text" id="chatInput" placeholder="Type a message..." autocomplete="off" />
+    <button id="sendBtn" title="Send message">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
     </button>
   </div>
-  <div class="hint" id="hint">Loading…</div>
 </div>
 
 <script>
@@ -83,11 +124,14 @@ fetch('/api/clinic').then(r => r.json()).then(c => {
 
 (() => {
   const micBtn      = document.getElementById('micBtn');
+  const endBtn      = document.getElementById('endBtn');
   const statusDot    = document.getElementById('statusDot');
   const statusText   = document.getElementById('statusText');
   const transcriptEl = document.getElementById('transcript');
   const hint          = document.getElementById('hint');
   const avatar        = document.getElementById('agentAvatar');
+  const chatInput    = document.getElementById('chatInput');
+  const sendBtn      = document.getElementById('sendBtn');
 
   let ws = null;
   let audioCtx = null;
@@ -95,6 +139,7 @@ fetch('/api/clinic').then(r => r.json()).then(c => {
   let micStream = null;
   let sourceNode = null;
   let isCallActive = false;
+  let isMicActive = false;
   let interimLine = null;
 
   // Sequential playback queue for AI audio chunks
@@ -127,14 +172,22 @@ fetch('/api/clinic').then(r => r.json()).then(c => {
     transcriptEl.scrollTop = transcriptEl.scrollHeight;
   }
 
-  function connectWS() {
+  function connectWS(onOpenCallback = null) {
+    if (ws && ws.readyState === 1) {
+      if (onOpenCallback) onOpenCallback();
+      return;
+    }
     const proto = location.protocol === 'https:' ? 'wss' : 'ws';
     ws = new WebSocket(`${proto}://${location.host}/ws`);
     ws.binaryType = 'arraybuffer';
 
+    isCallActive = true;
+    endBtn.style.display = 'block';
+
     ws.onopen = () => {
       setStatus('live', 'Connected');
       ws.send(JSON.stringify({ type: 'start_mic' }));
+      if (onOpenCallback) onOpenCallback();
     };
 
     ws.onmessage = (evt) => {
@@ -158,6 +211,7 @@ fetch('/api/clinic').then(r => r.json()).then(c => {
     ws.onclose = () => {
       setStatus('', 'Disconnected');
       avatar.classList.remove('speaking');
+      cleanupSession();
     };
 
     ws.onerror = () => setStatus('', 'Connection error');
@@ -249,31 +303,94 @@ fetch('/api/clinic').then(r => r.json()).then(c => {
     if (ws && ws.readyState === 1) ws.send(JSON.stringify({ type: 'stop_mic' }));
   }
 
+  function cleanupSession() {
+    isCallActive = false;
+    isMicActive = false;
+    micBtn.classList.remove('active');
+    endBtn.style.display = 'none';
+    hint.textContent = `Tap the mic to start talking with ${CLINIC.name}`;
+    stopMic();
+    if (ws) {
+      try { ws.close(); } catch (_) {}
+      ws = null;
+    }
+    playQueue = [];
+  }
+
+  // Toggle Mic usage in call
   micBtn.addEventListener('click', async () => {
-    if (!isCallActive) {
-      isCallActive = true;
-      micBtn.classList.add('active');
-      hint.textContent = 'Listening… tap to end the call';
+    if (!isMicActive) {
       setStatus('connecting', 'Connecting…');
-      transcriptEl.innerHTML = '';
-      connectWS();
-      try {
-        await startMic();
-      } catch (e) {
-        setStatus('', 'Microphone access denied');
-        hint.textContent = 'Please allow microphone access and try again.';
-        isCallActive = false;
-        micBtn.classList.remove('active');
+      hint.textContent = 'Starting microphone…';
+      
+      const proceedMic = async () => {
+        try {
+          await startMic();
+          isMicActive = true;
+          micBtn.classList.add('active');
+          hint.textContent = 'Microphone live · speak or type below';
+        } catch (e) {
+          console.error(e);
+          setStatus('', 'Microphone access denied');
+          hint.textContent = 'Please allow mic access to talk, or use text chat below.';
+          if (ws && !isPlaying && playQueue.length === 0) {
+            // Keep WS open for text chat, but mic not active
+            isMicActive = false;
+            micBtn.classList.remove('active');
+          } else {
+            cleanupSession();
+          }
+        }
+      };
+
+      if (!ws || ws.readyState !== 1) {
+        connectWS(proceedMic);
+      } else {
+        await proceedMic();
       }
     } else {
-      isCallActive = false;
-      micBtn.classList.remove('active');
-      hint.textContent = `Tap the mic to start talking with ${CLINIC.name}`;
-      setStatus('', 'Call ended');
       stopMic();
-      if (ws) { ws.close(); ws = null; }
-      playQueue = [];
+      isMicActive = false;
+      micBtn.classList.remove('active');
+      hint.textContent = 'Microphone muted. Tap mic to talk, or type below';
     }
+  });
+
+  // End Session button
+  endBtn.addEventListener('click', () => {
+    setStatus('', 'Call ended');
+    cleanupSession();
+  });
+
+  // Send Text Message
+  function sendText() {
+    const val = chatInput.value.trim();
+    if (!val) return;
+
+    chatInput.value = '';
+    
+    const transmit = () => {
+      if (ws && ws.readyState === 1) {
+        ws.send(JSON.stringify({ type: 'user_message', text: val }));
+      }
+    };
+
+    if (!ws || ws.readyState !== 1) {
+      setStatus('connecting', 'Connecting…');
+      hint.textContent = 'Connecting chat session…';
+      connectWS(() => {
+        addLine('You', val, false);
+        transmit();
+      });
+    } else {
+      addLine('You', val, false);
+      transmit();
+    }
+  }
+
+  sendBtn.addEventListener('click', sendText);
+  chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendText();
   });
 })();
 </script>

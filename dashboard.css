@@ -674,16 +674,11 @@ body {
   .topbar { display: flex; }
   .sidebar {
     transform: translateX(-100%);
-    height: 100%;
+    height: 100dvh;
     overflow-y: scroll;
   }
   .sidebar.open { transform: none; box-shadow: var(--shadow-xl); }
   .sidebar .sb-nav { overflow: visible; flex: none; height: auto; }
-  .sidebar .sb-item { color: #8892a4; font-size: 13.5px; }
-  .sidebar .sb-item.active { color: #10b981; }
-  .sidebar .sb-item:hover { color: #f0f2f7; }
-  .sidebar .sb-logo-name { color: #f0f2f7; font-size: 15px; }
-  .sidebar .sb-logo-sub { color: #4a5162; }
   .shell { margin-left: 0; padding-top: var(--topbar-h); max-width: 100vw; overflow-x: hidden; }
   .page { padding: 18px 16px 32px; }
   .header { display: none; }

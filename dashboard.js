@@ -103,10 +103,12 @@ document.querySelectorAll('[data-page]').forEach(el => {
 function closeMobileSidebar() {
   $('sidebar').classList.remove('open');
   $('mobOverlay').classList.remove('show');
+  document.body.classList.remove('sidebar-open');
 }
 $('hamBtn')?.addEventListener('click', () => {
-  $('sidebar').classList.toggle('open');
+  const isOpen = $('sidebar').classList.toggle('open');
   $('mobOverlay').classList.toggle('show');
+  document.body.classList.toggle('sidebar-open', isOpen);
 });
 $('mobOverlay')?.addEventListener('click', closeMobileSidebar);
 

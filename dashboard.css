@@ -673,8 +673,9 @@ body {
 @media (max-width: 768px) {
   .topbar { display: flex; }
   .sidebar {
+    top: var(--topbar-h);
     transform: translateX(-100%);
-    height: 100dvh;
+    height: calc(100dvh - var(--topbar-h));
     overflow-y: scroll;
   }
   .sidebar.open { transform: none; box-shadow: var(--shadow-xl); }

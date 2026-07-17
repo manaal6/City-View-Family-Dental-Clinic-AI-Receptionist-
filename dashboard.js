@@ -103,14 +103,10 @@ document.querySelectorAll('[data-page]').forEach(el => {
 function closeMobileSidebar() {
   $('sidebar').classList.remove('open');
   $('mobOverlay').classList.remove('show');
-  document.documentElement.classList.remove('sidebar-open');
-  document.body.classList.remove('sidebar-open');
 }
 $('hamBtn')?.addEventListener('click', () => {
   const isOpen = $('sidebar').classList.toggle('open');
   $('mobOverlay').classList.toggle('show');
-  document.documentElement.classList.toggle('sidebar-open', isOpen);
-  document.body.classList.toggle('sidebar-open', isOpen);
 });
 $('mobOverlay')?.addEventListener('click', closeMobileSidebar);
 

@@ -678,6 +678,7 @@ body {
     overflow-y: auto;
   }
   .sidebar.open { transform: none; box-shadow: var(--shadow-xl); }
+  .sidebar .sb-nav { overflow-y: visible; flex: none; height: auto; }
   .shell { margin-left: 0; padding-top: var(--topbar-h); max-width: 100vw; overflow-x: hidden; }
   .page { padding: 18px 16px 32px; }
   .header { display: none; }

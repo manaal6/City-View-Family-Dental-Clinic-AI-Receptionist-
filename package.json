@@ -13,6 +13,7 @@
     "dotenv": "^16.6.1",
     "express": "^4.22.1",
     "groq-sdk": "^0.3.3",
+    "playwright": "^1.61.1",
     "ws": "^8.20.0"
   },
   "engines": {
